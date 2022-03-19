@@ -23,7 +23,6 @@ public class Page3 extends WebPage {
                 .executor()
                 .values(number)
                 .step(() -> {
-                    System.out.println("[PARAM] Page3 -> Page8 (" + number + ")");
                     currentNumber = number;
                 })
                 .build();
@@ -40,19 +39,15 @@ public class Page3 extends WebPage {
     protected void pageNavigationInfo() {
         addDependentParam(dependentParamPage1Page2());
         addNavigation(new Page2(), () -> {
-            System.out.println("[GO] go to Page 2");
             currentPage = "2";
         });
         addNavigation(new Page4(), () -> {
-            System.out.println("[GO] go to Page 4");
             currentPage = "4";
         });
         addNavigation(new Page7(), () -> {
-            System.out.println("[GO] go to Page 7");
             currentPage = "7";
         });
         addNavigation(new Page8(), paramPage3Page8("1111"), () -> {
-            System.out.println("[GO] go to Page 8");
             currentPage = "8";
         });
     }

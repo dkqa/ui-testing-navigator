@@ -34,7 +34,7 @@ public class PageParamExecutorBuilder {
     }
 
     public PageParamExecutorBuilder values(String... values) {
-        this.param.values(values);
+        this.param.setValues(values);
         return this;
     }
 

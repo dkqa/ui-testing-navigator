@@ -15,7 +15,6 @@ public class Page9 extends WebPage {
         addDependentParam(dependentParamPage1Page2());
         addDependentParam(dependentParamPage3Page8());
         addNavigation(new Page8(), () -> {
-            System.out.println("[GO] go to Page 8");
             currentPage = "8";
         });
     }

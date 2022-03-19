@@ -7,7 +7,7 @@ public class ExecuteTest {
 
     @Test
     public void test() {
-//        WebPage.currentPage = "3";
+//        WebPage.currentPage = "33";
         new Page9().navigate();
         new Page9()
                 .param(Page3.paramPage3Page8("11112"))

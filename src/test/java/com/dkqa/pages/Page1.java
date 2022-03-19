@@ -15,7 +15,6 @@ public class Page1 extends WebPage {
                 .executor()
                 .values(user)
                 .step(() -> {
-                    System.out.println("[PARAM] Page1 -> Page2 (" + user + ")");
                     currentUser = user;
                 })
                 .build();
@@ -24,7 +23,6 @@ public class Page1 extends WebPage {
     @Override
     protected void pageNavigationInfo() {
         addNavigation(new Page2(), paramToPage2("Default"), () -> {
-            System.out.println("[GO] go to Page 2");
             currentPage = "2";
         });
     }

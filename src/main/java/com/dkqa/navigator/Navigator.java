@@ -27,6 +27,7 @@ import com.dkqa.navigator.action.PageAction;
 import com.dkqa.navigator.param.PageParamExecutor;
 import com.dkqa.navigator.param.PageParamDependent;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.dkqa.navigator.PageNavigatorFactoryMethod.getPageName;
@@ -39,6 +40,7 @@ class Navigator {
 
     private NavigatorAction actionBeforePageDefinition;
     private NavigatorAction actionUnknownPage;
+    private NavigatorAction actionNavigationFailed;
     private int iterationCount = 3;
     private double waitPage = 3;
     private int navigationHistorySize = 15;
@@ -54,6 +56,10 @@ class Navigator {
 
     protected void setActionUnknownPage(NavigatorAction action) {
         this.actionUnknownPage = action;
+    }
+
+    protected void setActionNavigationFailed(NavigatorAction action) {
+        this.actionNavigationFailed = action;
     }
 
     protected void setIterationCount(int count) {
@@ -79,6 +85,9 @@ class Navigator {
         String toPageName = getPageName(toPage.getClass());
         String currentPage = definePageNotUnknown();
 
+        System.out.println();
+        System.out.println(logDate() + " [NAVIGATION][START] Navigate to '" + toPageName + "' (current page '" + currentPage + "')");
+
         cycleParam:
         for (PageParamExecutor param : params) {
             String pointPage = param.info().fromPageName();
@@ -86,15 +95,17 @@ class Navigator {
             route.add(0, currentPage);
 
             for (String page : route) {
-                PageParamDependent dependentParam = mapPages(page).pageDependentParam(param.info().name());
+                PageParamDependent dependentParam = mapPages(page).pageDependentParam(param.info().getName());
 
                 if (dependentParam != null) {
                     if (!currentPage.equals(page)) {
                         currentPage = navigate(currentPage, page, params);
                     }
                     if (param.equals(dependentParam)) {
+                        System.out.println(logDate() + " [NAVIGATION][CHECK PARAM] true (param - " + param.info().getName() + ")(page - " + page + ")");
                         continue cycleParam;
                     } else {
+                        System.out.println(logDate() + " [NAVIGATION][CHECK PARAM] false (param - " + param.info().getName() + ")(page - " + page + ")");
                         break;
                     }
                 }
@@ -113,7 +124,7 @@ class Navigator {
         for (int i = 0; i < iterationCount; i++) {
             List<String> route = getRoute(currentPage, toPage);
             if (route.size() > 0) {
-                System.out.println("Route: " + currentPage + " -> " + String.join(" -> ", route));
+                System.out.println(logDate() + " [NAVIGATION][ROUTE] " + currentPage + " -> " + String.join(" -> ", route));
             }
 
             for (String nextPage : route) {
@@ -133,6 +144,7 @@ class Navigator {
             if (currentPage.equals(toPage)) return currentPage;
         }
 
+        applyActionNavigationFailed();
         throw new NavigationException();
     }
 
@@ -140,13 +152,13 @@ class Navigator {
         for (int i = 0; i < 3; i++) {
             String currentPage = definePage(estimatedPages);
             if (currentPage.equals(UNKNOWN_PAGE)) {
-                if (actionUnknownPage != null) {
-                    actionUnknownPage.apply();
-                }
+                applyActionUnknownPage();
             } else {
                 return currentPage;
             }
         }
+
+        applyActionNavigationFailed();
         throw new NavigationException();
     }
 
@@ -163,6 +175,7 @@ class Navigator {
     }
 
     private void goPage(String fromPage, String toPage) {
+        System.out.println(logDate() + " [NAVIGATION][WAY] Go to " + toPage);
         mapPages(fromPage).pageWay(toPage).go();
     }
 
@@ -173,15 +186,14 @@ class Navigator {
                     .filter(p -> p.equals(param))
                     .findFirst()
                     .orElse(param);
+            System.out.println(logDate() + " [NAVIGATION][SET PARAM] " + resultParam.info().getName() + " " + resultParam.info().getJoiningValues(", ", "(", ")"));
             resultParam.apply();
         }
     }
 
     protected String definePage(String... estimatedPages) {
 
-        if (actionBeforePageDefinition != null) {
-            actionBeforePageDefinition.apply();
-        }
+        applyActionBeforePageDefinition();
 
         for(String page : estimatedPages) {
             if (mapPages(page).pageDeterminant().determinate()) {
@@ -209,6 +221,24 @@ class Navigator {
             if (pageAction != null) {
                 pageAction.go();
             }
+        }
+    }
+
+    private void applyActionNavigationFailed() {
+        if (actionNavigationFailed != null) {
+            actionNavigationFailed.apply();
+        }
+    }
+
+    private void applyActionUnknownPage() {
+        if (actionUnknownPage != null) {
+            actionUnknownPage.apply();
+        }
+    }
+
+    private void applyActionBeforePageDefinition() {
+        if (actionBeforePageDefinition != null) {
+            actionBeforePageDefinition.apply();
         }
     }
 
@@ -290,6 +320,10 @@ class Navigator {
 
     private Page mapPages(String page) {
         return mapPages.get(page);
+    }
+
+    private String logDate() {
+        return new SimpleDateFormat().format(new Date());
     }
 
     class NavigationHistory extends ArrayList<String> {

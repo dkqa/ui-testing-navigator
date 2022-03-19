@@ -84,7 +84,16 @@ class PageRegister {
                     e1.printStackTrace();
                 }
             } catch (InstantiationException | IllegalAccessException e1) {
-                e1.printStackTrace();
+                    try {
+                        Object o = clazz.getDeclaredField("INSTANCE").get(null);
+                        try {
+                            return (Page) method.invoke(o);
+                        } catch (InvocationTargetException e2) {
+                            e2.printStackTrace();
+                        }
+                    } catch (IllegalAccessException | NoSuchFieldException ex) {
+                        ex.printStackTrace();
+                    }
             }
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();

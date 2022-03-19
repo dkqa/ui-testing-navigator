@@ -51,6 +51,16 @@ public abstract class Page {
         return navigatorBuilder().buildInstance().definePage();
     }
 
+    public void goTo(Page page) {
+        String fromPageName = getPageName(this.getClass());
+        String toPageName = getPageName(page.getClass());
+        PageWay way = ways.get(toPageName);
+        if (way == null) {
+            throw new RuntimeException(fromPageName + " page has not way to " + toPageName + " page");
+        }
+        way.go();
+    }
+
     public Page page() {
         pageNavigationInfo();
         return this;
@@ -65,19 +75,20 @@ public abstract class Page {
     public void navigate() {
         List<PageParamExecutor> params = new ArrayList<>(navigationParams);
         navigationParams = new ArrayList<>();
-        System.out.println();
-        System.out.println("Navigate");
+
         navigatorBuilder().buildInstance().navigate(this, params);
     }
 
     // Methods for pageNavigationInfo()
     protected void addNavigation(Page toPage, PageStep step, double stepWeigh) {
         String pageName = getPageName(toPage.getClass());
-        stepWeigh = (stepWeigh > 0) ? stepWeigh : 1;
-        if (ways.get(pageName) != null) {
-            throw new RuntimeException("The page has duplicate navigation to " + pageName);
+        if (!pageName.equals(getPageName(this.getClass()))) {
+            stepWeigh = (stepWeigh > 0) ? stepWeigh : 1;
+            if (ways.get(pageName) != null) {
+                throw new RuntimeException("The page has duplicate navigation to " + pageName);
+            }
+            ways.put(pageName, new PageWay(step, stepWeigh));
         }
-        ways.put(pageName, new PageWay(step, stepWeigh));
     }
 
     protected void addNavigation(Page toPage, PageParamExecutor param, PageStep step, double stepWeigh) {
@@ -110,7 +121,7 @@ public abstract class Page {
     }
 
     protected void addDependentParam(PageParamDependent param) {
-        dependentParams.put(param.info().name(), param);
+        dependentParams.put(param.info().getName(), param);
     }
 
     // Methods for getting info

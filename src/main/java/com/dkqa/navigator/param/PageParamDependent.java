@@ -36,7 +36,7 @@ public class PageParamDependent {
 
     public PageParam info() {
         String[] arrayValues = values.stream().map(PageParamValue::get).toArray(String[]::new);
-        return this.param.values(arrayValues);
+        return this.param.setValues(arrayValues);
     }
 
     public boolean equals(PageParamExecutor param) {

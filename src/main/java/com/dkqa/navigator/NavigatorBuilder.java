@@ -38,6 +38,7 @@ public class NavigatorBuilder {
     private Navigator navigator;
     private NavigatorAction actionBeforePageDefinition;
     private NavigatorAction actionUnknownPage;
+    private NavigatorAction actionNavigationFailed;
     private int iterationCount;
     private double waitPageSeconds;
     private int navigationHistorySize;
@@ -59,6 +60,11 @@ public class NavigatorBuilder {
 
     public NavigatorBuilder setActionUnknownPage(NavigatorAction action) {
         actionUnknownPage = action;
+        return this;
+    }
+
+    public NavigatorBuilder setActionNavigationFailed(NavigatorAction action) {
+        actionNavigationFailed = action;
         return this;
     }
 
@@ -92,6 +98,7 @@ public class NavigatorBuilder {
             navigator = new Navigator(graphPages);
             navigator.setActionBeforePageDefinition(actionBeforePageDefinition);
             navigator.setActionUnknownPage(actionUnknownPage);
+            navigator.setActionNavigationFailed(actionNavigationFailed);
             navigator.setIterationCount(iterationCount);
             navigator.setWaitPageSeconds(waitPageSeconds);
             navigator.setNavigationHistorySize(navigationHistorySize);
@@ -108,7 +115,6 @@ public class NavigatorBuilder {
             super("Pages belonging to the navigation named '"
                     + navigatorName + "' were not found in the packages: "
                     + Arrays.stream(pagePaths).collect(Collectors.joining("', '", "'", "'"))
-                    + " (this name is defined in the method - Page.navigatorName)"
             );
         }
     }

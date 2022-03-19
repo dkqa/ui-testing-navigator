@@ -12,11 +12,9 @@ public class Page5 extends WebPage {
     protected void pageNavigationInfo() {
         addDependentParam(dependentParamPage1Page2());
         addNavigation(new Page4(), () -> {
-            System.out.println("[GO] go to Page 4");
             currentPage = "4";
         });
         addNavigation(new Page11(), () -> {
-            System.out.println("[GO] go to Page 11");
             currentPage = "411111";
         });
     }

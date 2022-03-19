@@ -27,6 +27,7 @@ import com.dkqa.navigator.Page;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.dkqa.navigator.PageNavigatorFactoryMethod.getPageName;
 
@@ -43,7 +44,7 @@ public class PageParam {
         this.name = fromPageName + " -> " + toPageName;
     }
 
-    protected PageParam values(String... values) {
+    protected PageParam setValues(String... values) {
         this.values = Arrays.asList(values);
         return this;
     }
@@ -56,8 +57,12 @@ public class PageParam {
         return toPageName;
     }
 
-    public String name() {
+    public String getName() {
         return name;
+    }
+
+    public String getJoiningValues(String delimiter, String prefix, String suffix) {
+        return values.stream().collect(Collectors.joining(delimiter, prefix, suffix));
     }
 
     public boolean equalsByName(PageParam param) {
