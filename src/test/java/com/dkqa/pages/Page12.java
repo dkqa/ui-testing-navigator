@@ -3,26 +3,22 @@ package com.dkqa.pages;
 import com.dkqa.navigator.Page;
 import com.dkqa.navigator.PageMarker;
 
-import static com.dkqa.pages.Page3.dependentParamPage1Page2;
+@PageMarker(pageName = "12")
+public class Page12 extends TestPage {
 
-@PageMarker(pageName = "Page12")
-public class Page12 extends WebPage {
+    @Override
+    protected String determinantName() {
+        return "12";
+    }
 
     @Override
     protected void pageNavigationInfo() {
-        addDependentParam(dependentParamPage1Page2());
-        addNavigation(new Page11(), () -> {
-            currentPage = "11";
-        });
+        addNavigation(new Page2(), () -> currentPage = "2");
+        addNavigation(new Page13(), () -> currentPage = "13");
     }
 
     @Override
     public Page registerPage() {
         return page();
-    }
-
-    @Override
-    protected String determinantName() {
-        return "12";
     }
 }

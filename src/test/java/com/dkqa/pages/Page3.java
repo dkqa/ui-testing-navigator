@@ -4,61 +4,33 @@ import com.dkqa.navigator.Page;
 import com.dkqa.navigator.PageMarker;
 import com.dkqa.navigator.param.PageParamBuilder;
 import com.dkqa.navigator.param.PageParamDependent;
-import com.dkqa.navigator.param.PageParamExecutor;
 
-@PageMarker(pageName = "Page3")
-public class Page3 extends WebPage {
+@PageMarker(pageName = "3")
+public class Page3 extends TestPage {
 
-    public static String currentNumber;
-
-    public static PageParamDependent dependentParamPage1Page2() {
-        return new PageParamBuilder(new Page1(), new Page2())
+    public static PageParamDependent dependentParam2() {
+        return new PageParamBuilder(new Page2(), new Page3())
                 .dependent()
-                .value(() -> Page1.currentUser)
+                .value(() -> Page2.param2)
                 .build();
-    }
-
-    public static PageParamExecutor paramPage3Page8(String number) {
-        return new PageParamBuilder(new Page3(), new Page8())
-                .executor()
-                .values(number)
-                .step(() -> {
-                    currentNumber = number;
-                })
-                .build();
-    }
-
-    public static PageParamDependent dependentParamPage3Page8() {
-        return new PageParamBuilder(new Page3(), new Page8())
-                .dependent()
-                .value(() -> currentNumber)
-                .build();
-    }
-
-    @Override
-    protected void pageNavigationInfo() {
-        addDependentParam(dependentParamPage1Page2());
-        addNavigation(new Page2(), () -> {
-            currentPage = "2";
-        });
-        addNavigation(new Page4(), () -> {
-            currentPage = "4";
-        });
-        addNavigation(new Page7(), () -> {
-            currentPage = "7";
-        });
-        addNavigation(new Page8(), paramPage3Page8("1111"), () -> {
-            currentPage = "8";
-        });
-    }
-
-    @Override
-    public Page registerPage() {
-        return page();
     }
 
     @Override
     protected String determinantName() {
         return "3";
+    }
+
+    @Override
+    protected void pageNavigationInfo() {
+        addDependentParam(Page2.dependentParam1());
+        addDependentParam(dependentParam2());
+        addNavigation(new Page2(), () -> currentPage = "2");
+        addNavigation(new Page4(), () -> currentPage = "4");
+        addNavigation(new Page5(), () -> currentPage = "5");
+    }
+
+    @Override
+    public Page registerPage() {
+        return page();
     }
 }

@@ -3,17 +3,17 @@ package com.dkqa.pages;
 import com.dkqa.navigator.Page;
 import com.dkqa.navigator.PageMarker;
 
-@PageMarker(pageName = "11")
-public class Page11 extends TestPage {
+@PageMarker(pageName = "17")
+public class Page17 extends TestPage {
 
     @Override
     protected String determinantName() {
-        return "11";
+        return "17";
     }
 
     @Override
     protected void pageNavigationInfo() {
-        addNavigation(new Page2(), () -> currentPage = "2");
+        addNavigation(new Page12(), () -> currentPage = "12");
     }
 
     @Override

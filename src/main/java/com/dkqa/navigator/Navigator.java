@@ -33,7 +33,7 @@ import java.util.*;
 
 import static com.dkqa.navigator.PageNavigatorFactoryMethod.getPageName;
 
-class Navigator {
+public class Navigator {
 
     private final HashMap<String, Page> mapPages;
     private final HashMap<String, ArrayList<String>> foundedRoutes = new HashMap<>();
@@ -263,8 +263,9 @@ class Navigator {
             foundedRoutes.put(from + " -> " + to, new ArrayList<>(route));
         }
 
-        if (route.size() != 0) {
+        route = new ArrayList<>(route);
 
+        if (route.size() != 0) {
             route.remove(0);
         } else {
             throw new RouteException(from, to);
@@ -369,13 +370,13 @@ class Navigator {
         }
     }
 
-    class RouteException extends RuntimeException {
+    public class RouteException extends RuntimeException {
         RouteException(String from, String to) {
             super("It is impossible to build a route from the '" + from + "' page to the '" + to + "' page");
         }
     }
 
-    class NavigationException extends RuntimeException {
+    public class NavigationException extends RuntimeException {
         NavigationException() {
             super("Navigation failed\n Route history (list of last " + navigationHistorySize + " pages):\n-> ... ->\n-> " + String.join(" ->\n-> ", history));
         }
