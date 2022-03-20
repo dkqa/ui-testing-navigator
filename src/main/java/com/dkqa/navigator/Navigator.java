@@ -102,10 +102,10 @@ class Navigator {
                         currentPage = navigate(currentPage, page, params);
                     }
                     if (param.equals(dependentParam)) {
-                        System.out.println(logDate() + " [NAVIGATION][CHECK PARAM] true (param - " + param.info().getName() + ")(page - " + page + ")");
+                        System.out.println(logDate() + " [NAVIGATION][CHECK PARAM][TRUE] Param '" + param.info().getName() + "' on page '" + page + "'");
                         continue cycleParam;
                     } else {
-                        System.out.println(logDate() + " [NAVIGATION][CHECK PARAM] false (param - " + param.info().getName() + ")(page - " + page + ")");
+                        System.out.println(logDate() + " [NAVIGATION][CHECK PARAM][FALSE] Param '" + param.info().getName() + "' on page '" + page + "'");
                         break;
                     }
                 }
@@ -115,6 +115,7 @@ class Navigator {
         }
 
         navigate(currentPage, toPageName, params);
+        System.out.println(logDate() + " [NAVIGATION][END]");
     }
 
     private String navigate(String fromPage, String toPage, List<PageParamExecutor> params) {
@@ -204,7 +205,7 @@ class Navigator {
 
         String page = mapPages.keySet().stream()
                 .filter(k -> mapPages(k).pageDeterminant().determinate())
-                .filter(k -> mapPages(k).pagePreviousPage() == null || (mapPages(k).pagePreviousPage().equals(history.lastPage()) | k.equals(history.lastPage())))
+                .filter(k -> mapPages(k).pagePreviousPages() == null || (mapPages(k).pagePreviousPages().contains(history.lastPage()) | k.equals(history.lastPage())))
                 .findFirst()
                 .orElse(UNKNOWN_PAGE);
 

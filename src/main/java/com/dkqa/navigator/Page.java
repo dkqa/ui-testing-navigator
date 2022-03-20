@@ -35,7 +35,7 @@ import static com.dkqa.navigator.PageNavigatorFactoryMethod.getPageName;
 public abstract class Page {
 
     private PageAction action;
-    private String previousPage;
+    private List<String> previousPages;
     private HashMap<String, PageWay> ways = new HashMap<>();
     private HashMap<String, PageParamExecutor> params = new HashMap<>();
     private HashMap<String, PageParamDependent> dependentParams = new HashMap<>();
@@ -114,9 +114,14 @@ public abstract class Page {
         this.action = action;
     }
 
-    protected void addPreviousPage(Page page) {
-        if (page != null) {
-            previousPage = getPageName(page.getClass());
+    protected void addPreviousPage(Page... variants) {
+        for (Page page : variants) {
+            if (page != null) {
+                if (previousPages == null) {
+                    previousPages = new ArrayList<>();
+                }
+                previousPages.add(getPageName(page.getClass()));
+            }
         }
     }
 
@@ -129,8 +134,8 @@ public abstract class Page {
         return action;
     }
 
-    protected String pagePreviousPage() {
-        return previousPage;
+    protected List<String> pagePreviousPages() {
+        return previousPages;
     }
 
     protected HashMap<String, PageWay> pageWays() {
