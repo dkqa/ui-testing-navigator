@@ -12,12 +12,7 @@ public abstract class WebPage extends Page {
 
     @Override
     protected NavigatorBuilder navigatorBuilder() {
-        return new NavigatorBuilder("WebNavigation", "com.dkqa.pages*", "com.dkqa.pages*")
-//                .setActionBeforePageDefinition(() -> System.out.println("Action Before Page Definition"))
-                /*.setActionUnknownPage(() -> {
-                    System.out.println("Action Unknown Page");
-                    currentPage = "1";
-                })*/;
+        return new NavigatorBuilder("WebNavigation", "com.dkqa.pages*", "com.dkqa.pages*");
     }
 
     @Override

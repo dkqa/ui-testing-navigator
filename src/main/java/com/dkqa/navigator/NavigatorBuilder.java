@@ -23,6 +23,7 @@
 package com.dkqa.navigator;
 
 import com.dkqa.navigator.action.NavigatorAction;
+import com.dkqa.navigator.action.NavigatorLog;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -43,6 +44,8 @@ public class NavigatorBuilder {
     private double waitPageSeconds;
     private int navigationHistorySize;
     private String unknownPageName;
+    private NavigatorLog log;
+    private String logDateFormat;
 
     public NavigatorBuilder(String navigatorName, String... packagePaths) {
         this.name = navigatorName;
@@ -88,6 +91,17 @@ public class NavigatorBuilder {
         return this;
     }
 
+    public NavigatorBuilder setActionLog(String dateFormat, NavigatorLog log) {
+        this.logDateFormat = dateFormat;
+        this.log = log;
+        return this;
+    }
+
+    public NavigatorBuilder setActionLog(NavigatorLog log) {
+        this.log = log;
+        return this;
+    }
+
     protected Navigator buildInstance() {
         if (navigators.get(name) == null) {
             System.out.println("Register navigation - " + name);
@@ -103,6 +117,7 @@ public class NavigatorBuilder {
             navigator.setWaitPageSeconds(waitPageSeconds);
             navigator.setNavigationHistorySize(navigationHistorySize);
             navigator.setUnknownPageName(unknownPageName);
+            navigator.setActionLog(logDateFormat, log);
             navigators.put(name, navigator);
         } else {
             navigator = navigators.get(name);

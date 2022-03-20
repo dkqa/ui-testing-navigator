@@ -23,6 +23,7 @@
 package com.dkqa.navigator;
 
 import com.dkqa.navigator.action.NavigatorAction;
+import com.dkqa.navigator.action.NavigatorLog;
 import com.dkqa.navigator.action.PageAction;
 import com.dkqa.navigator.param.PageParamExecutor;
 import com.dkqa.navigator.param.PageParamDependent;
@@ -45,6 +46,9 @@ class Navigator {
     private double waitPage = 3;
     private int navigationHistorySize = 15;
     private NavigationHistory history = new NavigationHistory(navigationHistorySize);
+
+    private NavigatorLog log = System.out::println;
+    private String logDateFormat;
 
     protected Navigator(HashMap<String, Page> mapPages) {
         this.mapPages = mapPages;
@@ -81,12 +85,19 @@ class Navigator {
         }
     }
 
+    protected void setActionLog(String dateFormat, NavigatorLog log) {
+        this.logDateFormat = dateFormat;
+        if (log != null) {
+            this.log = log;
+        }
+    }
+
     protected void navigate(Page toPage, List<PageParamExecutor> params) {
         String toPageName = getPageName(toPage.getClass());
         String currentPage = definePageNotUnknown();
 
-        System.out.println();
-        System.out.println(logDate() + " [NAVIGATION][START] Navigate to '" + toPageName + "' (current page '" + currentPage + "')");
+        log.print("");
+        log.print(logDate() + " [NAVIGATION][START] Navigate to '" + toPageName + "' (current page '" + currentPage + "')");
 
         cycleParam:
         for (PageParamExecutor param : params) {
@@ -102,10 +113,10 @@ class Navigator {
                         currentPage = navigate(currentPage, page, params);
                     }
                     if (param.equals(dependentParam)) {
-                        System.out.println(logDate() + " [NAVIGATION][CHECK PARAM][TRUE] Param '" + param.info().getName() + "' on page '" + page + "'");
+                        log.print(logDate() + " [NAVIGATION][CHECK PARAM][TRUE] Param '" + param.info().getName() + "' on page '" + page + "'");
                         continue cycleParam;
                     } else {
-                        System.out.println(logDate() + " [NAVIGATION][CHECK PARAM][FALSE] Param '" + param.info().getName() + "' on page '" + page + "'");
+                        log.print(logDate() + " [NAVIGATION][CHECK PARAM][FALSE] Param '" + param.info().getName() + "' on page '" + page + "'");
                         break;
                     }
                 }
@@ -115,7 +126,7 @@ class Navigator {
         }
 
         navigate(currentPage, toPageName, params);
-        System.out.println(logDate() + " [NAVIGATION][END]");
+        log.print(logDate() + " [NAVIGATION][END]");
     }
 
     private String navigate(String fromPage, String toPage, List<PageParamExecutor> params) {
@@ -125,7 +136,7 @@ class Navigator {
         for (int i = 0; i < iterationCount; i++) {
             List<String> route = getRoute(currentPage, toPage);
             if (route.size() > 0) {
-                System.out.println(logDate() + " [NAVIGATION][ROUTE] " + currentPage + " -> " + String.join(" -> ", route));
+                log.print(logDate() + " [NAVIGATION][ROUTE] " + currentPage + " -> " + String.join(" -> ", route));
             }
 
             for (String nextPage : route) {
@@ -176,7 +187,7 @@ class Navigator {
     }
 
     private void goPage(String fromPage, String toPage) {
-        System.out.println(logDate() + " [NAVIGATION][WAY] Go to " + toPage);
+        log.print(logDate() + " [NAVIGATION][WAY] Go to " + toPage);
         mapPages(fromPage).pageWay(toPage).go();
     }
 
@@ -187,7 +198,7 @@ class Navigator {
                     .filter(p -> p.equals(param))
                     .findFirst()
                     .orElse(param);
-            System.out.println(logDate() + " [NAVIGATION][SET PARAM] " + resultParam.info().getName() + " " + resultParam.info().getJoiningValues(", ", "(", ")"));
+            log.print(logDate() + " [NAVIGATION][SET PARAM] " + resultParam.info().getName() + " " + resultParam.info().getJoiningValues(", ", "(", ")"));
             resultParam.apply();
         }
     }
@@ -324,7 +335,10 @@ class Navigator {
     }
 
     private String logDate() {
-        return new SimpleDateFormat().format(new Date());
+        if (logDateFormat == null) {
+            return new SimpleDateFormat().format(new Date());
+        }
+        return new SimpleDateFormat(logDateFormat).format(new Date());
     }
 
     class NavigationHistory extends ArrayList<String> {
