@@ -22,14 +22,17 @@
 
 package com.dkqa.navigator;
 
-import net.sf.corn.cps.CPScanner;
-import net.sf.corn.cps.ClassFilter;
-
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.dkqa.navigator.PageNavigatorFactoryMethod.getPageName;
 
@@ -63,12 +66,60 @@ class PageRegister {
         return mapPages;
     }
 
-    private static List<Class<?>> getPageClasses(String path) {
-        return CPScanner.scanClasses(
-                new ClassFilter()
-                        .packageName(path)
-                        .annotation(PageMarker.class)
-        );
+    private static List<Class<?>> getPageClasses(String packageName) {
+        packageName = toCorrectPackagePath(packageName);
+        List<String> namesClasses = getNamesClasses(packageName);
+        List<? extends Class<?>> pagesClasses = namesClasses.stream()
+                .map(name -> getClass(name))
+                .filter(aClass -> isPageClass(aClass))
+                .collect(Collectors.toList());
+        return (List<Class<?>>) pagesClasses;
+    }
+
+    private static List<String> getNamesClasses(String packagePath) {
+        List<String> classesNames = new ArrayList<>();
+
+        String pathForFinding = packagePath.replaceAll("[.]", "/");
+        InputStream stream = ClassLoader.getSystemClassLoader().getResourceAsStream(pathForFinding);
+
+        if (stream != null) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+            List<String> lines = reader.lines().collect(Collectors.toList());
+
+            List<String> localClassesNames = lines.stream()
+                    .filter(line -> line.contains(".class"))
+                    .map(name -> packagePath + "." + name.replace(".class", ""))
+                    .collect(Collectors.toList());
+            classesNames.addAll(localClassesNames);
+
+            List<String> localPackagesNames = lines.stream()
+                    .filter(line -> !line.contains("."))
+                    .map(name -> packagePath + "." + name)
+                    .collect(Collectors.toList());
+            localPackagesNames.forEach(packageName -> {
+                List<String> classesFromPackage = getNamesClasses(packageName);
+                classesNames.addAll(classesFromPackage);
+            });
+        }
+
+        return classesNames;
+    }
+
+    private static String toCorrectPackagePath(String path) {
+        return path.replaceAll("[\\\\/]", ".");
+    }
+
+    private static Class<?> getClass(String classFullName) {
+        try {
+            return Class.forName(classFullName);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static boolean isPageClass(Class<?> clazz) {
+        Annotation[] annotations = clazz.getAnnotations();
+        return Arrays.stream(annotations).anyMatch(annotation -> annotation instanceof PageMarker);
     }
 
     private static Page getPageObject(Class clazz) {

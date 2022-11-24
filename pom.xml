@@ -6,7 +6,7 @@
 
     <groupId>io.github.dkqa</groupId>
     <artifactId>ui-testing-navigator</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 
     <name>UI testing navigator</name>
     <description>Navigation in UI testing</description>
@@ -122,11 +122,6 @@
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>net.sf.corn</groupId>
-            <artifactId>corn-cps</artifactId>
-            <version>1.1.10</version>
-        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
