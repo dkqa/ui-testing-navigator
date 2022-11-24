@@ -19,7 +19,7 @@ public abstract class TestPage extends Page {
         return new NavigatorBuilder("WebNavigation", "com.dkqa.pages")
                 .setActionLog((s -> {
                     //20.03.22 16:50
-                    assertLog.add(s.replaceAll("\\d{2}\\.\\d{2}\\.\\d{2} \\d{2}:\\d{2} ", ""));
+                    assertLog.add(s.replaceAll("^.+\\[NAVIGATION]", "[NAVIGATION]"));
                     System.out.println(s);
                 }));
     }
