@@ -209,6 +209,7 @@ public class Navigator {
 
         for(String page : estimatedPages) {
             if (mapPages(page).pageDeterminant().determinate()) {
+                applyPageAction(page);
                 history.add(page);
                 return page;
             }
